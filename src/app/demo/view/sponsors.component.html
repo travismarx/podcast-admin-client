@@ -1,0 +1,118 @@
+<audio id="audioGhost" style="opacity: 0" src="newEpisodeData.enclosure.attributes.url"></audio>
+
+
+<div class="ui-g-12">
+  <p-messages [(value)]="infoMsgs"></p-messages>
+</div>
+
+<div class="ui-g-12">
+
+  <p-dataGrid #activeTable *ngIf="sponsors" [value]="sponsors" [rows]="15" [paginator]="true">
+    <ng-template let-sponsor pTemplate="item">
+      <div style="padding:3px" class="ui-g-12 ui-md-3">
+        <p-panel [header]="sponsor.company" [style]="{'text-align':'center'}">
+          <!--<img src="assets/showcase/images/demo/car/{{car.brand}}.png" width="60">-->
+          <div class="car-detail">Image goes here</div>
+          <hr class="ui-widget-content" style="border-top:0">
+          <!--<i class="fa fa-search" (click)="selectCar(car)" style="cursor:pointer"></i>-->
+        </p-panel>
+      </div>
+    </ng-template>
+  </p-dataGrid>
+</div>
+
+<p-dialog *ngIf="podcastInfo" header="General Info for {{podcastInfo.title.textContent}}" modal="true" [(visible)]="showGeneralInfo">
+  <div class="ui-g-12">
+    <label>Podcast Title</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="podcastInfo.title.textContent" />
+  </div>
+  <div class="ui-g-12">
+    <label>Podcast Description</label>
+    <textarea pInputTextarea class="full-width" autoResize="true" [(ngModel)]="podcastInfo.description.textContent"></textarea>
+  </div>
+  <div class="ui-g-6">
+    <label>Feed Link</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="podcastInfo['atom:link'].attributes.href.textContent"
+    />
+  </div>
+  <div class="ui-g-6">
+    <label>Last Updated Time</label>
+    <input type="text" placeholder="Pub Date" class="full-width" pInputText [(ngModel)]="podcastInfo.pubDate.textContent" />
+  </div>
+</p-dialog>
+
+<p-dialog *ngIf="podcastInfo" [resizable]="true" header="Add a new episode for {{podcastInfo.title.textContent}}" [modal]="true"
+  [(visible)]="showCreateDialog" (onHide)="resetNewEpisode()">
+  <p-messages [(value)]="fileInfoError"></p-messages>
+
+  <div class="ui-g-12" *ngIf="route.params['value'].id === 'steveshow'">
+    <p-selectButton class="full-width" [options]="steveDefaults" (onChange)="changeSteveDefault($event)"></p-selectButton>
+  </div>
+  <div class="ui-g-12">
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="newEpisodeData.title.textContent" />
+  </div>
+  <div class="ui-g-12">
+    <textarea pInputTextarea placeholder="Episode Description" class="full-width" [(ngModel)]="newEpisodeData.description.textContent"></textarea>
+  </div>
+  <div class="ui-g-6">
+    <input type="text" placeholder="File Name" class="full-width" pInputText (blur)="getFileSize()" [(ngModel)]="newEpisodeData.enclosure.attributes.url"
+    />
+  </div>
+  <div class="ui-g-6">
+    <input type="text" placeholder="File Size" class="full-width" pInputText [(ngModel)]="newEpisodeData.enclosure.attributes.length"
+    />
+  </div>
+  <div class="ui-g-6">
+    <p-inputMask mask="9:99:99" placeholder="H:MM:SS Duration" [(ngModel)]="newEpisodeData['itunes:duration'].textContent"></p-inputMask>
+  </div>
+  <div class="ui-g-6">
+    <input type="text" placeholder="Published Date" class="full-width" pInputText [(ngModel)]="newEpisodeData.pubDate.textContent"
+    />
+  </div>
+  <!--<div class="ui-g-12">
+    <p-chips placeholder="Keywords (hit enter to separate)" class="full-width" [(ngModel)]="newEpisodeData['itunes:keywords'].textContent"></p-chips>
+  </div>-->
+  <p-footer>
+    <div class="ui-g-12 ui-helper-clearfix text-right">
+      <!--<button pButton label="cancel" class="black-btn" (click)="closeEpisodeEdit()"></button>-->
+      <p-splitButton class="pull-right" label="Save New Episode & Feed" icon="fa-save" [model]="newEpisodeBtnOptions" (onClick)="newEpisodeSaveFeed(dt)"></p-splitButton>
+    </div>
+  </p-footer>
+</p-dialog>
+
+<p-dialog *ngIf="podcastInfo && editingEpisodeData" [modal]="true" [(visible)]="editingEpisodeData">
+  <div class="ui-g-12">
+    <label>Episode Title</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="editingEpisodeData.title.textContent" />
+  </div>
+  <div class="ui-g-12">
+    <label>Episode Description</label>
+    <textarea pInputTextarea placeholder="Episode Description" class="full-width" [(ngModel)]="editingEpisodeData.description.textContent"></textarea>
+  </div>
+  <div class="ui-g-12">
+    <label>Audio URL</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="editingEpisodeData.enclosure.attributes.url"
+    />
+  </div>
+  <div class="ui-g-4">
+    <label>File Size</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="editingEpisodeData.enclosure.attributes.length"
+    />
+  </div>
+  <div class="ui-g-3">
+    <label>Duration</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="editingEpisodeData['itunes:duration'].textContent"
+    />
+  </div>
+  <div class="ui-g-5">
+    <label>Publish Date</label>
+    <input type="text" placeholder="Title" class="full-width" pInputText [(ngModel)]="editingEpisodeData.pubDate.textContent"
+    />
+  </div>
+  <p-footer>
+    <div class="ui-g-12 ui-helper-clearfix text-right">
+      <!--<button pButton label="cancel" class="black-btn" (click)="closeEpisodeEdit()"></button>-->
+      <p-splitButton class="pull-right" label="Save Episode" icon="fa-save" [model]="editEpisodeOptions" (onClick)="closeEpisodeEdit()"></p-splitButton>
+    </div>
+  </p-footer>
+</p-dialog>

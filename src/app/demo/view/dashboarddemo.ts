@@ -1,55 +1,108 @@
-import {Component,OnInit} from '@angular/core';
-import {CarService} from '../service/carservice';
-import {EventService} from '../service/eventservice';
-import {Car} from '../domain/car';
-import {SelectItem} from 'primeng/primeng';
+import { Component, OnInit } from "@angular/core";
+import { CarService } from "../service/carservice";
+import { EventService } from "../service/eventservice";
+import { Car } from "../domain/car";
+import { SelectItem } from "primeng/primeng";
+
+import * as moment from "moment";
 
 @Component({
-    templateUrl: './dashboard.html'
+  templateUrl: "./dashboard.html"
 })
 export class DashboardDemo implements OnInit {
-    
-    cities: SelectItem[];
-    
-    cars: Car[];
-    
-    chartData: any;
-    
-    events: any[];
-    
-    selectedCity: any;
+  cities: SelectItem[];
 
-    constructor(private carService: CarService, private eventService: EventService) { }
-    
-    ngOnInit() {
-        this.carService.getCarsSmall().then(cars => this.cars = cars);
-        
-        this.eventService.getEvents().then(events => {this.events = events;});
-        
-        this.cities = [];
-        this.cities.push({label:'Select City', value:null});
-        this.cities.push({label:'New York', value:{id:1, name: 'New York', code: 'NY'}});
-        this.cities.push({label:'Rome', value:{id:2, name: 'Rome', code: 'RM'}});
-        this.cities.push({label:'London', value:{id:3, name: 'London', code: 'LDN'}});
-        this.cities.push({label:'Istanbul', value:{id:4, name: 'Istanbul', code: 'IST'}});
-        this.cities.push({label:'Paris', value:{id:5, name: 'Paris', code: 'PRS'}});    
-        
-        this.chartData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'First Dataset',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    borderColor: '#FFC107'
-                },
-                {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    fill: false,
-                    borderColor: '#03A9F4'
-                }
-            ]
-        }
+  cars: Car[];
+
+  liveShows;
+
+  chartData: any;
+
+  events: any[];
+
+  selectedCity: any;
+
+  addingToSchedule = false;
+
+  showTitleOptions = [
+    {
+      label: "The PulpMX Show",
+      value: "pulpmx"
+    },
+    {
+      label: "Fly Moto:60 Show",
+      value: "moto60"
     }
+  ];
+
+  newLiveEvent = {
+    epPodTitleAbbr: null,
+    showtime: null,
+    epPodAbbr: null,
+    epPodTitle: null,
+    guests: null,
+    epDescription: null,
+    title: null,
+    start: null,
+    unix: null,
+    epPodImage: null
+  };
+
+  constructor(private carService: CarService, private eventService: EventService) {}
+
+  ngOnInit() {
+    this.eventService.getLiveShowSchedule().then(schedule => {
+      this.liveShows = schedule;
+    });
+  }
+
+  addShowToSchedule(e) {
+    this.addingToSchedule = true;
+    let dayOfWeek = e.date.format("d");
+    this.newLiveEvent.start = e.date.format("YYYY-MM-DD");
+
+    if (dayOfWeek == 1) {
+      this.newLiveEvent.epPodTitleAbbr = "pulpmx";
+      this.newLiveEvent.epPodAbbr = "pulpmx";
+      this.newLiveEvent.showtime = "18:00";
+      this.newLiveEvent.title = this.showTitleOptions[0].label;
+      (this.newLiveEvent.epPodImage = "img/showthumbs/pulpmx.png"), (this.newLiveEvent.epPodTitle =
+        "The PulpMX Show Presented by BTOSports.com and Fly Racing");
+    } else if (dayOfWeek == 4) {
+      this.newLiveEvent.title = this.showTitleOptions[1].label;
+      this.newLiveEvent.epPodTitleAbbr = "moto60";
+      this.newLiveEvent.epPodAbbr = "moto60";
+      this.newLiveEvent.showtime = "12:00";
+      this.newLiveEvent.guests = "The usuals";
+      (this.newLiveEvent.epPodImage = "img/showthumbs/moto60.png"), (this.newLiveEvent.epPodTitle =
+        "The Fly Racing Moto:60 Show Presented by Truck Hero, Pro Taper, and GET Data");
+    }
+  }
+
+  handleEventClicked(e) {
+  }
+
+  saveNewLiveEvent() {
+    this.newLiveEvent.unix = Number(
+      moment(`${this.newLiveEvent.start} ${this.newLiveEvent.showtime}`, "YYYY-MM-DD HH:mm")
+        .utcOffset("-08:00")
+        .format("X")
+    );
+    this.liveShows.push(this.newLiveEvent);
+    this.eventService.saveLiveSchedule(this.liveShows)
+
+    this.addingToSchedule = false;
+    this.newLiveEvent = {
+      epPodTitleAbbr: null,
+      showtime: null,
+      epPodAbbr: null,
+      epPodTitle: null,
+      guests: null,
+      epDescription: null,
+      title: null,
+      start: null,
+      unix: null,
+      epPodImage: null
+    };
+  }
 }

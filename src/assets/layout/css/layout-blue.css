@@ -1088,7 +1088,7 @@ body {
     .layout-wrapper .topbar .morpheus-logo-link .morpheus-logo {
       vertical-align: middle;
       height: 28px;
-      margin-top: -7px; }
+      margin-top: 0; }
     .layout-wrapper .topbar .morpheus-logo-link .morpheus-logo-text {
       color: #6ec5ff;
       font-size: 22px;

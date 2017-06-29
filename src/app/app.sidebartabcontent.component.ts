@@ -1,10 +1,10 @@
-import {Component,AfterViewInit,ViewChild,OnDestroy,ElementRef} from '@angular/core';
+import { Component, AfterViewInit, ViewChild, OnDestroy, ElementRef } from "@angular/core";
 
 declare var jQuery: any;
 
 @Component({
-    selector: 'app-sidebarTabContent',
-    template: `
+  selector: "app-sidebarTabContent",
+  template: `
         <div class="layout-submenu-content" (click)="onClick($event)">
             <div #scroller class="nano">
                 <div class="nano-content menu-scroll-content">
@@ -14,26 +14,26 @@ declare var jQuery: any;
         </div>
     `
 })
-export class AppSidebarTabContent implements AfterViewInit,OnDestroy {
-    
-    @ViewChild('scroller') layoutMenuScrollerViewChild: ElementRef;
-    
-    scroller: HTMLDivElement;
-    
-    ngAfterViewInit() {
-        this.scroller = <HTMLDivElement> this.layoutMenuScrollerViewChild.nativeElement;
-        setTimeout(() => {
-            jQuery(this.scroller).nanoScroller({flash:true});
-        }, 10);
-    }
-    
-    onClick(event: Event) {
-        setTimeout(() => {
-            jQuery(this.scroller).nanoScroller();
-        }, 500);
-    }
+export class AppSidebarTabContent implements AfterViewInit, OnDestroy {
+  @ViewChild("scroller") layoutMenuScrollerViewChild: ElementRef;
 
-    ngOnDestroy() {
-        jQuery(this.scroller).nanoScroller({destroy:true});
-    }
+  scroller: HTMLDivElement;
+
+  ngAfterViewInit() {
+    this.scroller = <HTMLDivElement>this.layoutMenuScrollerViewChild.nativeElement;
+    setTimeout(() => {
+      jQuery(this.scroller).nanoScroller({ flash: true });
+    }, 10);
+  }
+
+  onClick(event: Event) {
+    console.log(event, "event");
+    setTimeout(() => {
+      jQuery(this.scroller).nanoScroller();
+    }, 500);
+  }
+
+  ngOnDestroy() {
+    jQuery(this.scroller).nanoScroller({ destroy: true });
+  }
 }

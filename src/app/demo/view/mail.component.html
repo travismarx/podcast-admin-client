@@ -1,0 +1,47 @@
+<div class="ui-g-12">
+  <p-messages [(value)]="infoMsgs"></p-messages>
+</div>
+
+<div class="ui-g-12" *ngIf="mailLists">
+  <div class="ui-g-3 ui-sm-12">
+    <!--<label class="full-width">Available Mail Lists</label>-->
+    <p-dropdown *ngIf="mailLists" [options]="mailLists" class="full-width" [style]="{'width': '100%'}" [autoWidth]="false" [(ngModel)]="selectedMailList"
+      placeholder="Select a list"></p-dropdown>
+  </div>
+  <div class="ui-g-2 ui-sm-6">
+    <button *ngIf="mailLists" pButton type="button" label="Get List Info" class="pull-left" (click)="getListData()"></button>
+  </div>
+  <div class="ui-g-7 ui-sm-6">
+    <button *ngIf="mailLists" pButton type="button" label="Save List" icon="fa-save" class="pull-right" (click)="saveMailList()"></button>
+  </div>
+</div>
+
+<div class="ui-g-12" *ngIf="mailListData['recipients']">
+  <div class="ui-g-3 ui-sm-6">
+    <input pInputText class="full-width" placeholder="New Recipient Address" [(ngModel)]="newRecipient.address.email" />
+  </div>
+  <div class="ui-g-3 ui-sm-6">
+    <input pInputText class="full-width" placeholder="New Recipient Name" [(ngModel)]="newRecipient.address.name" />
+  </div>
+  <div class="ui-g-2 ui-sm-12">
+    <button pButton type="button" class="clearfix full-width" label="Add New Recipient" icon="fa-plus" (click)="addNewRecipient()" [disabled]="!newRecipient.address.email && !newRecipient.address.name"></button>
+  </div>
+</div>
+
+<div class="ui-g-12">
+  <p-dataTable #activeTable [loading]="loading" [value]="mailListData['recipients']" [rows]="10" [paginator]="true" [editable]="true">
+    <p-header>{{mailListData['name']}}</p-header>
+    <p-column *ngIf="mailListData" field="address.email" header="Email Address" [editable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column *ngIf="mailListData" field="address.name" header="Name" [filter]="true" filterPlaceholder="Search" [editable]="true"></p-column>
+    <!--<p-column styleClass="col-button" [style]="{'width': '52px'}" *ngIf="mailListData">
+      <ng-template let-episode="rowData" pTemplate="body">
+        <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-edit"></button>
+      </ng-template>
+    </p-column>-->
+    <p-column styleClass="col-button" [style]="{'width': '52px'}" *ngIf="mailListData">
+      <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
+        <button type="button" class="pink-btn" pButton (click)="removeFromMailList(episode, i)" icon="fa-trash"></button>
+      </ng-template>
+    </p-column>
+  </p-dataTable>
+</div>

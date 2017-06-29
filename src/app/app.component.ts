@@ -67,6 +67,9 @@ export class AppComponent implements AfterViewInit {
             this.activeTabIndex = index;
             this.sidebarActive = true;
         }
+        if (this.activeTabIndex === 1) {
+            this.sidebarActive = !this.sidebarActive;
+        }
 
         event.preventDefault();
     }
@@ -88,6 +91,8 @@ export class AppComponent implements AfterViewInit {
     }
 
     onMenuButtonClick(event: Event, index: number) {
+        console.log(event, 'event onMenuButtonClick');
+
         this.menuButtonClick = true;
         this.rotateMenuButton = !this.rotateMenuButton;
         this.topbarMenuActive = false;
