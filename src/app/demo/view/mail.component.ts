@@ -19,6 +19,7 @@ export class Mail {
   sponsors;
   editingEpisodeData;
   mailLists;
+  convertedList;
   mailListData = {};
   selectedMailList;
   newRecipient = {
@@ -27,10 +28,15 @@ export class Mail {
       name: null
     }
   };
+  private appendListOptions = [
+    {
+      label: "Add to list only",
+      icon: "fa-plus",
+      command: () => this.appendNewList()
+    }
+  ];
 
-  constructor(
-    private mailService: MailService
-  ) {}
+  constructor(private mailService: MailService) {}
 
   ngOnInit() {
     this.loading = true;
@@ -38,10 +44,13 @@ export class Mail {
       let mailListOptions = [];
       res.forEach(i => {
         mailListOptions.push(
-          Object.assign({}, {
-            label: i['name'],
-            value: i['id']
-          })
+          Object.assign(
+            {},
+            {
+              label: i["name"],
+              value: i["id"]
+            }
+          )
         );
       });
       this.mailLists = mailListOptions;
@@ -63,8 +72,9 @@ export class Mail {
   }
 
   removeFromMailList(episode, idx) {
-    this.mailListData["recipients"].splice(idx, 1);
-    this.mailListData["recipients"] = this.mailListData["recipients"];
+    let recipients = this.mailListData['recipients'];
+    recipients.splice(idx, 1);
+    this.mailListData["recipients"] = recipients
     this.activeTable["value"] = this.mailListData["recipients"];
   }
 
@@ -94,5 +104,21 @@ export class Mail {
         name: null
       }
     };
+  }
+
+  appendNewList(save: boolean = false) {
+    this.mailListData["recipients"] = this.convertedList.concat(this.mailListData["recipients"]);
+
+    if (save) {
+      this.saveMailList();
+    }
+    setTimeout(() => {
+      this.convertedList = null;
+    });
+  }
+
+  verifyCsvConversion(e) {
+    let newList = JSON.parse(e.xhr.response);
+    this.convertedList = newList;
   }
 }

@@ -27,7 +27,6 @@ export class AppSidebarTabContent implements AfterViewInit, OnDestroy {
   }
 
   onClick(event: Event) {
-    console.log(event, "event");
     setTimeout(() => {
       jQuery(this.scroller).nanoScroller();
     }, 500);

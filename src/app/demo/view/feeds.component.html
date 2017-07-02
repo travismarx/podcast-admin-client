@@ -5,9 +5,9 @@
   <p-messages [(value)]="infoMsgs"></p-messages>
 </div>
 
-<div class="ui-g-12">
-  <p-fileUpload name="file" customUpload="true" (uploadHandler)="fileUploader($event)"></p-fileUpload>
-</div>
+<!--<div class="ui-g-12">
+  <p-fileUpload name="file" url="https://admin.pulpmx.com/audioUpload?show={{podAbbr}}" (onUpload)="verifyUpload($event)"></p-fileUpload>
+</div>-->
 
 <div class="ui-g-12">
   <div class="podcast-card" *ngIf="podcastInfo">
@@ -36,7 +36,7 @@
         <p-column field="pubDate.textContent" header="Date Created"></p-column>
         <p-column styleClass="col-button" [style]="{'width': '102px'}">
           <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
-            <button type="button" class="green-btn" pButton label="Publish" icon="fa-check" (click)="publishInactiveEpisode(episode, i)"></button>
+            <button type="button" class="green-btn" pButton label="Publish" icon="fa-check" (click)="toggleEpisodeStatus(episode, i, 'inactive')"></button>
           </ng-template>
         </p-column>
         <p-column styleClass="col-button" [style]="{'width': '52px'}">
@@ -49,13 +49,18 @@
   </p-accordion>
   <br *ngIf="podcastInfo && podcastInfo.inactiveEpisodes.length">
 
-  <p-dataTable #activeTable *ngIf="podcastInfo" [value]="podcastInfo.episodes" [rows]="10" [paginator]="true">
-    <p-header>Podcast Episodes</p-header>
+  <p-dataTable #activeTable *ngIf="podcastInfo" [value]="podcastInfo.episodes" [rows]="10" [paginator]="true" responsive="true">
+    <p-header>Podcast Episodes | {{podcastInfo.episodes.length}} total</p-header>
     <p-column field="title.textContent" header="Episode Title"></p-column>
-    <p-column field="pubDate.textContent" header="Published On"></p-column>
-    <p-column styleClass="col-button" [style]="{'width': '52px'}">
-      <ng-template let-episode="rowData" pTemplate="body">
-        <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-edit"></button>
+    <!--<p-column field="description.textContent" header="Description"></p-column>-->
+    <p-column field="enclosure.attributes.url" header="File" [style]="{'overflow': 'scroll'}"></p-column>
+    <p-column field="itunes:duration.textContent" header="Duration" [style]="{'width': '86px'}"></p-column>
+    <p-column field="enclosure.attributes.length" header="File Size" [style]="{'width': '106px'}"></p-column>
+    <p-column field="pubDate.textContent" header="Published On" [style]="{'width': '150px'}"></p-column>
+    <p-column styleClass="col-button" [style]="{'width': '86px'}">
+      <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
+        <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-pencil"></button>
+        <button type="button" class="pink-btn" pButton (click)="toggleEpisodeStatus(episode, i, 'active')" icon="fa-ban" pTooltip="Deactivate" tooltipPosition="left"></button>
       </ng-template>
     </p-column>
   </p-dataTable>
@@ -81,9 +86,20 @@
   </div>
 </p-dialog>
 
-<p-dialog *ngIf="podcastInfo" [resizable]="true" header="Add a new episode for {{podcastInfo.title.textContent}}" [modal]="true"
-  [(visible)]="showCreateDialog" (onHide)="resetNewEpisode()">
+<p-dialog class="ui-fluid" *ngIf="podcastInfo" [resizable]="true" header="Add a new episode for {{podcastInfo.title.textContent}}"
+  [modal]="true" [(visible)]="showCreateDialog" (onHide)="resetNewEpisode()">
   <p-messages [(value)]="fileInfoError"></p-messages>
+
+  <div class="ui-g-3"></div>
+  <div class="ui-g-6">
+    <p-fileUpload mode="advanced" name="file" url="https://admin.pulpmx.com/audioUpload?show={{podAbbr}}" (onUpload)="verifyUpload($event)"
+      chooseLabel="Choose a file" accept="audio/*">
+      <ng-template pTemplate="content">
+        <h4 class="text-center" *ngIf="!file">Drag & drop file here</h4>
+      </ng-template>
+    </p-fileUpload>
+  </div>
+  <div class="ui-g-3"></div>
 
   <div class="ui-g-12" *ngIf="route.params['value'].id === 'steveshow'">
     <p-selectButton class="full-width" [options]="steveDefaults" (onChange)="changeSteveDefault($event)"></p-selectButton>
@@ -94,20 +110,23 @@
   <div class="ui-g-12">
     <textarea pInputTextarea placeholder="Episode Description" class="full-width" [(ngModel)]="newEpisodeData.description.textContent"></textarea>
   </div>
-  <div class="ui-g-6">
-    <input type="text" placeholder="File Name" class="full-width" pInputText (blur)="getFileSize()" [(ngModel)]="newEpisodeData.enclosure.attributes.url"
+  <div class="ui-g-3">
+    <input type="text" placeholder="File Name" class="full-width" pInputText [(ngModel)]="newEpisodeData.enclosure.attributes.url"
     />
   </div>
-  <div class="ui-g-6">
+  <div class="ui-g-2">
     <input type="text" placeholder="File Size" class="full-width" pInputText [(ngModel)]="newEpisodeData.enclosure.attributes.length"
     />
   </div>
-  <div class="ui-g-6">
+  <div class="ui-g-2">
     <p-inputMask mask="9:99:99" placeholder="H:MM:SS Duration" [(ngModel)]="newEpisodeData['itunes:duration'].textContent"></p-inputMask>
   </div>
-  <div class="ui-g-6">
+  <div class="ui-g-3">
     <input type="text" placeholder="Published Date" class="full-width" pInputText [(ngModel)]="newEpisodeData.pubDate.textContent"
     />
+  </div>
+  <div class="ui-g-2">
+    <p-toggleButton onLabel="Inactive" offLabel="Inactive" onIcon="fa-check" offIcon="fa-square" [(ngModel)]="newEpisodeData.isInactive"></p-toggleButton>
   </div>
   <!--<div class="ui-g-12">
     <p-chips placeholder="Keywords (hit enter to separate)" class="full-width" [(ngModel)]="newEpisodeData['itunes:keywords'].textContent"></p-chips>
@@ -115,7 +134,8 @@
   <p-footer>
     <div class="ui-g-12 ui-helper-clearfix text-right">
       <!--<button pButton label="cancel" class="black-btn" (click)="closeEpisodeEdit()"></button>-->
-      <p-splitButton class="pull-right" label="Save New Episode & Feed" icon="fa-save" [model]="newEpisodeBtnOptions" (onClick)="newEpisodeSaveFeed(dt)"></p-splitButton>
+      <p-splitButton class="pull-right ui-helper-clearfix" label="Save Episode + Feed" icon="fa-save" [model]="newEpisodeBtnOptions"
+        (onClick)="newEpisodeSaveFeed(dt)"></p-splitButton>
     </div>
   </p-footer>
 </p-dialog>

@@ -17,7 +17,6 @@ export class EventService {
 
   getLiveShowSchedule() {
     return this.http.get("https://api.pulpmx.com/appinfo/liveSchedule").toPromise().then(res => {
-      console.log(res, "res for live schedule");
       return res.json().schedule;
     });
   }
@@ -27,14 +26,12 @@ export class EventService {
       .post("https://api.pulpmx.com/appinfo/liveSchedule", val)
       .toPromise()
       .then(res => {
-        console.log(res, "res for live schedule post");
         return res.json().schedule;
       });
   }
 
   getInfoDoc(type) {
     return this.http.get(`https://api.pulpmx.com/appinfo/${type}`).toPromise().then(res => {
-      console.log(res, "res for info item get");
       return res.json()[type];
     });
   }

@@ -11,25 +11,25 @@ export const Constants: any = {
       xmlName: "z_pmxs",
       url: "http://apptabs.pulpmx.com/z_pmxs.xml",
       feedburner:
-        "http://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FThePulpmxcomShow"
+        "https://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FThePulpmxcomShow"
     },
     steveshow: {
       xmlName: "z_tsms",
       url: "http://apptabs.pulpmx.com/z_tsms.xml",
       feedburner:
-        "http://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2Fpulpmx%2FRkNd"
+        "https://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2Fpulpmx%2FRkNd"
     },
     moto60: {
       xmlName: "z_pmxpreshow",
       url: "http://apptabs.pulpmx.com/z_pmxpreshow.xml",
       feedburner:
-        "http://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FTheFlyRacingMoto60Show"
+        "https://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FTheFlyRacingMoto60Show"
     },
     hockey: {
       xmlName: "z_pulphockey",
       url: "http://apptabs.pulpmx.com/z_pulphockey.xml",
       feedburner:
-        "http://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FThePulpHockeyShow"
+        "https://www.feedburner.com/fb/a/pingSubmit?bloglink=http%3A%2F%2Ffeeds.feedburner.com%2FThePulpHockeyShow"
     },
     keefer: {
       xmlName: "z_keefer",

@@ -17,7 +17,6 @@ export class FeedService {
   }
 
   saveAndWriteXml(podcastInfo, show) {
-    console.log(show, "show");
     podcastInfo.lastModified = moment().format("x");
     const config = {
       params: {
@@ -36,7 +35,6 @@ export class FeedService {
           .post(`https://admin.pulpmx.com/saveXml`, podcastInfo, config)
           .toPromise()
           .then(res => {
-            console.log(res, "written xml res");
             return res;
           });
       });

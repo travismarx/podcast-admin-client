@@ -52,13 +52,18 @@ export class Feeds {
   ];
   private newEpisodeBtnOptions = [
     {
-      label: "Add Episode Only",
+      label: "Just add episode",
       icon: "fa-plus"
+    }
+  ];
+  private episodeOptions = [
+    {
+      label: "Edit episode",
+      icon: "fa-pencil"
     },
     {
-      label: "Add to inactive episodes",
-      icon: "fa-ban",
-      command: () => this.addInactiveEpisode()
+      label: "Deactivate episode",
+      icon: "fa-ban"
     }
   ];
 
@@ -79,8 +84,27 @@ export class Feeds {
     });
   }
 
-  fileUploader(e) {
-    console.log(e, 'event on file upload');
+  audioUploadPrep(e) {
+    e.xhr.send(`show=${this.podAbbr}`);
+  }
+
+  verifyUpload(e) {
+    let file = e.files[0];
+    if (e.xhr.status === 200) {
+      this.fileInfoError.push({
+        severity: "success",
+        summary: "File successfully uploaded",
+        detail: `"${file.name}" has been added to its proper folder.`
+      });
+      this.newEpisodeData.enclosure.attributes.url = file.name;
+      this.newEpisodeData.enclosure.attributes.length = file.size.toLocaleString();
+
+      setTimeout(() => {
+        this.fileInfoError = [];
+      }, 4000);
+    }
+
+    this.getAudioDuration(file.name);
   }
 
   createNewEpisode() {
@@ -96,13 +120,21 @@ export class Feeds {
   }
 
   saveNewEpisode() {
-    const fileUrl = this.newEpisodeData.enclosure.attributes.url + ".mp3";
+    const fileUrl = this.newEpisodeData.enclosure.attributes.url;
+    const isInactive = this.newEpisodeData.isInactive;
+    const newEpisodeDest = !isInactive
+      ? this.podcastInfo.episodes
+      : this.podcastInfo.inactiveEpisodes;
+
     this.newEpisodeData.enclosure.attributes.url =
       Constants.enclosure_prefix[this.podAbbr] + fileUrl;
     this.newEpisodeData.guid.textContent = fileUrl;
     this.newEpisodeData["itunes:summary"].textContent = this.newEpisodeData.description.textContent;
 
-    // this.podcastInfo.episodes.unshift(this.newEpisodeData);
+    newEpisodeDest.unshift(this.newEpisodeData);
+    if (!isInactive) {
+      this.podcastInfo.pubDate.textContent = this.newEpisodeData.pubDate.textContent;
+    }
     setTimeout(() => {
       this.newEpisodeData = JSON.parse(JSON.stringify(EpisodeDefaults.emptyEpisode));
       this.showCreateDialog = false;
@@ -127,9 +159,46 @@ export class Feeds {
 
   newEpisodeSaveFeed() {
     this.saveNewEpisode();
-    setTimeout(() => this.saveFeed(), 2000);
+    // setTimeout(() => this.saveFeed(), 1000);
     // this.saveFeed();
   }
+
+  toggleEpisodeStatus(ep, idx, table) {
+    const pubDate = moment().format("ddd, DD MMM YYYY HH:mm:ss ZZ");
+    let src, dest;
+
+    table === "inactive"
+      ? ((src = "inactiveEpisodes"), (dest = "episodes"), (ep.pubDate.textContent = pubDate))
+      : ((src = "episodes"), (dest = "inactiveEpisodes"));
+
+    this.podcastInfo.pubDate.textContent = pubDate;
+    this.podcastInfo[dest].unshift(ep);
+    this.podcastInfo[src].splice(idx, 1);
+    this.activeTable["value"] = this.podcastInfo.episodes;
+
+    setTimeout(() => {
+      if (this.podcastInfo.inactiveEpisodes.length)
+        this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
+    });
+  }
+
+  // deactivateEpisode(episode, idx) {
+  //   console.log(episode, idx, "deactivating episode");
+  //   this.podcastInfo.inactiveEpisodes.unshift(episode);
+  //   this.podcastInfo.episodes.splice(idx, 1);
+  //   this.activeTable["value"] = this.podcastInfo.episodes;
+  //   setTimeout(() => {
+  //     this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
+  //   });
+  // }
+
+  // publishInactiveEpisode(episode, idx, table) {
+  //   console.log(table, "table");
+  //   this.podcastInfo.episodes.unshift(episode);
+  //   this.podcastInfo.inactiveEpisodes.splice(idx, 1);
+  //   this.activeTable["value"] = this.podcastInfo.episodes;
+  //   this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
+  // }
 
   changeSteveDefault(e) {
     const newDefault = e.value;
@@ -152,15 +221,8 @@ export class Feeds {
     });
   }
 
-  publishInactiveEpisode(episode, idx) {
-    this.podcastInfo.episodes.unshift(episode);
-    this.podcastInfo.inactiveEpisodes.splice(idx, 1);
-    this.activeTable["value"] = this.podcastInfo.episodes;
-    this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
-  }
-
   saveFeed() {
-    this.podcastInfo.pubDate.textContent = this.podcastInfo.episodes[0].pubDate.textContent;
+    this.podcastInfo.pubDate.textContent = moment().format("ddd, DD MMM YYYY HH:mm:ss ZZ")
     this.infoMsgs.push({
       severity: "info",
       detail: "Saving feed, please wait for confirmation"
@@ -173,7 +235,7 @@ export class Feeds {
       });
       setTimeout(() => {
         this.infoMsgs = [];
-      }, 5000)
+      }, 5000);
     });
   }
 
@@ -204,6 +266,18 @@ export class Feeds {
         }, 15000);
       }
     });
+  }
+
+  getAudioDuration(fileName) {
+    let audioSrc = Constants.enclosure_prefix[this.podAbbr] + fileName;
+    let ghost = document.getElementById("audioGhost").setAttribute("src", audioSrc);
+
+    document.getElementById("audioGhost").onloadedmetadata = e => {
+      const dur = e.target["duration"];
+      let formatted = moment.utc(dur * 1000).format("H:mm:ss");
+      this.newEpisodeData["itunes:duration"].textContent = formatted;
+      e.target["setAttribute"]("src", null);
+    };
   }
 
   clearMessagesTimer(waitVal) {

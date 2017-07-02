@@ -6,7 +6,7 @@
   <div class="ui-g-3 ui-sm-12">
     <!--<label class="full-width">Available Mail Lists</label>-->
     <p-dropdown *ngIf="mailLists" [options]="mailLists" class="full-width" [style]="{'width': '100%'}" [autoWidth]="false" [(ngModel)]="selectedMailList"
-      placeholder="Select a list"></p-dropdown>
+      placeholder="Select a list" (onChange)="getListData()"></p-dropdown>
   </div>
   <div class="ui-g-2 ui-sm-6">
     <button *ngIf="mailLists" pButton type="button" label="Get List Info" class="pull-left" (click)="getListData()"></button>
@@ -16,6 +16,38 @@
   </div>
 </div>
 
+<div class="ui-g-12" *ngIf="selectedMailList">
+  <div class="ui-g-3 ui-sm-0"></div>
+  <div class="ui-g-6 ui-sm-12">
+    <p-fileUpload name="file" url="https://admin.pulpmx.com/csvtojson" chooseLabel="Choose a file" accept="text/*" (onUpload)="verifyCsvConversion($event)">
+      <ng-template pTemplate="content">
+        <h4 class="text-center" *ngIf="!file">Drag & drop file here</h4>
+      </ng-template>
+    </p-fileUpload>
+  </div>
+  <div class="ui-g-3 ui-sm-0"></div>
+</div>
+
+<p-dialog *ngIf="convertedList" header="Confirm new recipients" [(visible)]="convertedList" modal="true" width="600">
+  <p-dataTable [value]="convertedList" [rows]="15" [paginator]="true">
+    <p-header>New Recipients ({{convertedList.length}} total)</p-header>
+    <p-column field="address.email" header="Email Address" [editable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="address.name" header="Name" [filter]="true" filterPlaceholder="Search"></p-column>
+    <!--<p-column styleClass="col-button" [style]="{'width': '52px'}">
+      <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
+        <button type="button" class="pink-btn" pButton (click)="removeFromMailList(episode, i)" icon="fa-trash"></button>
+      </ng-template>
+    </p-column>-->
+  </p-dataTable>
+  <p-footer>
+    <div class="ui-g-12 ui-helper-clearfix text-right">
+      <!--<button pButton label="cancel" class="black-btn" (click)="closeEpisodeEdit()"></button>-->
+      <p-splitButton class="pull-right ui-helper-clearfix" label="Add to list and save" icon="fa-save" [model]="appendListOptions"
+        (onClick)="appendNewList(true)"></p-splitButton>
+    </div>
+  </p-footer>
+</p-dialog>
+
 <div class="ui-g-12" *ngIf="mailListData['recipients']">
   <div class="ui-g-3 ui-sm-6">
     <input pInputText class="full-width" placeholder="New Recipient Address" [(ngModel)]="newRecipient.address.email" />
@@ -24,7 +56,8 @@
     <input pInputText class="full-width" placeholder="New Recipient Name" [(ngModel)]="newRecipient.address.name" />
   </div>
   <div class="ui-g-2 ui-sm-12">
-    <button pButton type="button" class="clearfix full-width" label="Add New Recipient" icon="fa-plus" (click)="addNewRecipient()" [disabled]="!newRecipient.address.email && !newRecipient.address.name"></button>
+    <button pButton type="button" class="clearfix full-width" label="Add New Recipient" icon="fa-plus" (click)="addNewRecipient()"
+      [disabled]="!newRecipient.address.email && !newRecipient.address.name"></button>
   </div>
 </div>
 
@@ -33,11 +66,6 @@
     <p-header>{{mailListData['name']}}</p-header>
     <p-column *ngIf="mailListData" field="address.email" header="Email Address" [editable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
     <p-column *ngIf="mailListData" field="address.name" header="Name" [filter]="true" filterPlaceholder="Search" [editable]="true"></p-column>
-    <!--<p-column styleClass="col-button" [style]="{'width': '52px'}" *ngIf="mailListData">
-      <ng-template let-episode="rowData" pTemplate="body">
-        <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-edit"></button>
-      </ng-template>
-    </p-column>-->
     <p-column styleClass="col-button" [style]="{'width': '52px'}" *ngIf="mailListData">
       <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
         <button type="button" class="pink-btn" pButton (click)="removeFromMailList(episode, i)" icon="fa-trash"></button>
