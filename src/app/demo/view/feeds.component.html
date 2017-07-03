@@ -39,9 +39,11 @@
             <button type="button" class="green-btn" pButton label="Publish" icon="fa-check" (click)="toggleEpisodeStatus(episode, i, 'inactive')"></button>
           </ng-template>
         </p-column>
-        <p-column styleClass="col-button" [style]="{'width': '52px'}">
+        <p-column styleClass="col-button" [style]="{'width': '86px'}">
           <ng-template let-episode="rowData" pTemplate="body">
             <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-edit"></button>
+            <button type="button" class="pink-btn" pButton (click)="deleteEpisode(episode, i, 'inactive')" icon="fa-trash" pTooltip="Delete"
+              tooltipPosition="left"></button>
           </ng-template>
         </p-column>
       </p-dataTable>
@@ -57,10 +59,13 @@
     <p-column field="itunes:duration.textContent" header="Duration" [style]="{'width': '86px'}"></p-column>
     <p-column field="enclosure.attributes.length" header="File Size" [style]="{'width': '106px'}"></p-column>
     <p-column field="pubDate.textContent" header="Published On" [style]="{'width': '150px'}"></p-column>
-    <p-column styleClass="col-button" [style]="{'width': '86px'}">
+    <p-column styleClass="col-button" [style]="{'width': '118px'}">
       <ng-template let-episode="rowData" let-i="rowIndex" pTemplate="body">
         <button type="button" pButton (click)="openEpisodeEditor(episode)" icon="fa-pencil"></button>
-        <button type="button" class="pink-btn" pButton (click)="toggleEpisodeStatus(episode, i, 'active')" icon="fa-ban" pTooltip="Deactivate" tooltipPosition="left"></button>
+        <button type="button" class="pink-btn" pButton (click)="toggleEpisodeStatus(episode, i, 'active')" icon="fa-ban" pTooltip="Deactivate"
+          tooltipPosition="left"></button>
+        <button type="button" class="pink-btn" pButton (click)="deleteEpisode(episode, i, 'active')" icon="fa-trash" pTooltip="Delete"
+          tooltipPosition="left"></button>
       </ng-template>
     </p-column>
   </p-dataTable>
@@ -92,7 +97,7 @@
 
   <div class="ui-g-3"></div>
   <div class="ui-g-6">
-    <p-fileUpload mode="advanced" name="file" url="https://admin.pulpmx.com/audioUpload?show={{podAbbr}}" (onUpload)="verifyUpload($event)"
+    <p-fileUpload mode="advanced" name="file" url="https://admin.pulpmx.com/audioUpload?show={{podAbbr}}" auto="true" (onUpload)="verifyUpload($event)"
       chooseLabel="Choose a file" accept="audio/*">
       <ng-template pTemplate="content">
         <h4 class="text-center" *ngIf="!file">Drag & drop file here</h4>
@@ -111,7 +116,7 @@
     <textarea pInputTextarea placeholder="Episode Description" class="full-width" [(ngModel)]="newEpisodeData.description.textContent"></textarea>
   </div>
   <div class="ui-g-3">
-    <input type="text" placeholder="File Name" class="full-width" pInputText [(ngModel)]="newEpisodeData.enclosure.attributes.url"
+    <input type="text" placeholder="File Name" class="full-width" pInputText (blur)="getFileSize()" [(ngModel)]="newEpisodeData.enclosure.attributes.url"
     />
   </div>
   <div class="ui-g-2">

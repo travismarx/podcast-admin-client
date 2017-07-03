@@ -53,7 +53,8 @@ export class Feeds {
   private newEpisodeBtnOptions = [
     {
       label: "Just add episode",
-      icon: "fa-plus"
+      icon: "fa-plus",
+      command: () => this.saveNewEpisode()
     }
   ];
   private episodeOptions = [
@@ -98,6 +99,7 @@ export class Feeds {
       });
       this.newEpisodeData.enclosure.attributes.url = file.name;
       this.newEpisodeData.enclosure.attributes.length = file.size.toLocaleString();
+      this.newEpisodeData.pubDate.textContent = moment().format("ddd, DD MMM YYYY HH:mm:ss ZZ");
 
       setTimeout(() => {
         this.fileInfoError = [];
@@ -120,23 +122,23 @@ export class Feeds {
   }
 
   saveNewEpisode() {
-    const fileUrl = this.newEpisodeData.enclosure.attributes.url;
-    const isInactive = this.newEpisodeData.isInactive;
+    let newEpData = this.newEpisodeData;
+    const fileUrl = newEpData.enclosure.attributes.url;
+    const isInactive = newEpData.isInactive;
     const newEpisodeDest = !isInactive
       ? this.podcastInfo.episodes
       : this.podcastInfo.inactiveEpisodes;
 
-    this.newEpisodeData.enclosure.attributes.url =
-      Constants.enclosure_prefix[this.podAbbr] + fileUrl;
-    this.newEpisodeData.guid.textContent = fileUrl;
-    this.newEpisodeData["itunes:summary"].textContent = this.newEpisodeData.description.textContent;
+    newEpData.enclosure.attributes.url = Constants.enclosure_prefix[this.podAbbr] + fileUrl;
+    newEpData.guid.textContent = fileUrl;
+    newEpData["itunes:summary"].textContent = newEpData.description.textContent;
 
-    newEpisodeDest.unshift(this.newEpisodeData);
+    newEpisodeDest.unshift(newEpData);
     if (!isInactive) {
-      this.podcastInfo.pubDate.textContent = this.newEpisodeData.pubDate.textContent;
+      this.podcastInfo.pubDate.textContent = newEpData.pubDate.textContent;
     }
     setTimeout(() => {
-      this.newEpisodeData = JSON.parse(JSON.stringify(EpisodeDefaults.emptyEpisode));
+      newEpData = JSON.parse(JSON.stringify(EpisodeDefaults.emptyEpisode));
       this.showCreateDialog = false;
       this.activeTable["value"] = this.podcastInfo.episodes;
     });
@@ -159,7 +161,7 @@ export class Feeds {
 
   newEpisodeSaveFeed() {
     this.saveNewEpisode();
-    // setTimeout(() => this.saveFeed(), 1000);
+    setTimeout(() => this.saveFeed(), 1000);
     // this.saveFeed();
   }
 
@@ -182,23 +184,21 @@ export class Feeds {
     });
   }
 
-  // deactivateEpisode(episode, idx) {
-  //   console.log(episode, idx, "deactivating episode");
-  //   this.podcastInfo.inactiveEpisodes.unshift(episode);
-  //   this.podcastInfo.episodes.splice(idx, 1);
-  //   this.activeTable["value"] = this.podcastInfo.episodes;
-  //   setTimeout(() => {
-  //     this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
-  //   });
-  // }
+  deleteEpisode(ep, idx, table) {
+    let src, dest;
 
-  // publishInactiveEpisode(episode, idx, table) {
-  //   console.log(table, "table");
-  //   this.podcastInfo.episodes.unshift(episode);
-  //   this.podcastInfo.inactiveEpisodes.splice(idx, 1);
-  //   this.activeTable["value"] = this.podcastInfo.episodes;
-  //   this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
-  // }
+    table === "inactive"
+      ? ((src = "inactiveEpisodes"), (dest = "episodes"))
+      : ((src = "episodes"), (dest = "inactiveEpisodes"));
+
+    this.podcastInfo[src].splice(idx, 1);
+    this.activeTable["value"] = this.podcastInfo.episodes;
+
+    setTimeout(() => {
+      if (this.podcastInfo.inactiveEpisodes.length)
+        this.inactiveTable["value"] = this.podcastInfo.inactiveEpisodes;
+    });
+  }
 
   changeSteveDefault(e) {
     const newDefault = e.value;
@@ -214,15 +214,8 @@ export class Feeds {
     this.editingEpisodeData = episode;
   }
 
-  closeEpisodeEdit() {
-    setTimeout(() => {
-      this.editingEpisodeData = null;
-      this.originalEpisodeData = null;
-    });
-  }
-
   saveFeed() {
-    this.podcastInfo.pubDate.textContent = moment().format("ddd, DD MMM YYYY HH:mm:ss ZZ")
+    this.podcastInfo.pubDate.textContent = moment().format("ddd, DD MMM YYYY HH:mm:ss ZZ");
     this.infoMsgs.push({
       severity: "info",
       detail: "Saving feed, please wait for confirmation"
@@ -240,30 +233,17 @@ export class Feeds {
   }
 
   getFileSize() {
-    if (!this.newEpisodeData.enclosure.attributes.url) return;
+    let enclosureAttrs = this.newEpisodeData.enclosure.attributes;
+    if (!enclosureAttrs.url || enclosureAttrs.length) return;
 
-    const fileName = this.newEpisodeData.enclosure.attributes.url + ".mp3";
+    let fileName = enclosureAttrs.url;
+    let len = fileName.length;
+    if (fileName.slice(len - 4, len) !== ".mp3") fileName = fileName + ".mp3";
+
     this.service.getFileSize(fileName, this.podAbbr).then(res => {
       if (!res.message) {
-        this.newEpisodeData.enclosure.attributes.length = res;
-        let audioSrc = Constants.enclosure_prefix[this.podAbbr] + fileName;
-        let ghost = document.getElementById("audioGhost").setAttribute("src", audioSrc);
-
-        document.getElementById("audioGhost").onloadedmetadata = e => {
-          const dur = e.target["duration"];
-          let formatted = moment.utc(dur * 1000).format("H:mm:ss");
-          this.newEpisodeData["itunes:duration"].textContent = formatted;
-          e.target["setAttribute"]("src", null);
-        };
-      } else {
-        this.fileInfoError.push({
-          severity: "error",
-          summary: "Something went wrong getting file size info",
-          detail: `The error message received is: ${res.message}`
-        });
-        setTimeout(() => {
-          this.fileInfoError = [];
-        }, 15000);
+        enclosureAttrs.length = res;
+        this.getAudioDuration(fileName);
       }
     });
   }
@@ -278,6 +258,13 @@ export class Feeds {
       this.newEpisodeData["itunes:duration"].textContent = formatted;
       e.target["setAttribute"]("src", null);
     };
+  }
+
+  closeEpisodeEdit() {
+    setTimeout(() => {
+      this.editingEpisodeData = null;
+      this.originalEpisodeData = null;
+    });
   }
 
   clearMessagesTimer(waitVal) {
