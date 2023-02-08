@@ -1,157 +1,153 @@
-import {Component,AfterViewInit,ElementRef,Renderer,ViewChild} from '@angular/core';
+import { Component, AfterViewInit, ElementRef, Renderer, ViewChild } from "@angular/core";
+import { UserService } from "./core";
 
 enum MenuOrientation {
-    STATIC,
-    OVERLAY
-};
+  STATIC,
+  OVERLAY
+}
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements AfterViewInit {
-    
-    activeTabIndex: number = -1;
-    
-    sidebarActive: boolean = false;
-    
-    layoutMode: MenuOrientation = MenuOrientation.STATIC;
-    
-    topbarMenuActive: boolean;
+  activeTabIndex: number = -1;
 
-    overlayMenuActive: boolean;
+  sidebarActive: boolean = false;
 
-    staticMenuDesktopInactive: boolean;
+  layoutMode: MenuOrientation = MenuOrientation.STATIC;
 
-    staticMenuMobileActive: boolean;
+  topbarMenuActive: boolean;
 
-    rotateMenuButton: boolean;
+  overlayMenuActive: boolean;
 
-    sidebarClick: boolean;
+  staticMenuDesktopInactive: boolean;
 
-    topbarItemClick: boolean;
-    
-    menuButtonClick: boolean;
+  staticMenuMobileActive: boolean;
 
-    activeTopbarItem: any;
+  rotateMenuButton: boolean;
 
-    documentClickListener: Function;
-    
-    theme: string = 'green';
+  sidebarClick: boolean;
 
-    constructor(public renderer: Renderer) {}
-    
-    ngAfterViewInit() {
-        this.documentClickListener = this.renderer.listenGlobal('body', 'click', (event) => {            
-            if(!this.topbarItemClick) {
-                this.activeTopbarItem = null;
-                this.topbarMenuActive = false;
-            }
-            
-            if(!this.menuButtonClick && !this.sidebarClick && (this.overlay || !this.isDesktop())) {
-                this.sidebarActive = false;
-            }
+  topbarItemClick: boolean;
 
-            this.topbarItemClick = false;
-            this.sidebarClick = false;
-            this.menuButtonClick = false;
-        });
-    }
-    
-    onTabClick(event: Event, index: number) {
-        if(this.activeTabIndex === index) {
-            this.sidebarActive = !this.sidebarActive;
-        }
-        else {
-            this.activeTabIndex = index;
-            this.sidebarActive = true;
-        }
-        if (this.activeTabIndex === 1) {
-            this.sidebarActive = !this.sidebarActive;
-        }
+  menuButtonClick: boolean;
 
-        event.preventDefault();
-    }
-    
-    closeSidebar(event: Event) {
-        this.sidebarActive = false;
-        event.preventDefault();
-    }
+  activeTopbarItem: any;
 
-    onSidebarClick(event: Event) {
-        this.sidebarClick = true;
-    }
+  documentClickListener: Function;
 
-    onTopbarMenuButtonClick(event: Event) {
-        this.topbarItemClick = true;
-        this.topbarMenuActive = !this.topbarMenuActive;
-                
-        event.preventDefault();
-    }
+  theme: string = "green";
 
-    onMenuButtonClick(event: Event, index: number) {
-        console.log(event, 'event onMenuButtonClick');
+  constructor(public renderer: Renderer, private user: UserService) {}
 
-        this.menuButtonClick = true;
-        this.rotateMenuButton = !this.rotateMenuButton;
+  ngAfterViewInit() {
+    this.documentClickListener = this.renderer.listenGlobal("body", "click", event => {
+      if (!this.topbarItemClick) {
+        this.activeTopbarItem = null;
         this.topbarMenuActive = false;
-        this.sidebarActive = !this.sidebarActive;
+      }
 
-        if(this.layoutMode === MenuOrientation.OVERLAY) {
-            this.overlayMenuActive = !this.overlayMenuActive;
-        }
-        else {
-            if(this.isDesktop())
-                this.staticMenuDesktopInactive = !this.staticMenuDesktopInactive;
-            else
-                this.staticMenuMobileActive = !this.staticMenuMobileActive;
-        }
-        
-        if(this.activeTabIndex < 0) {
-            this.activeTabIndex = 0;
-        }
+      if (!this.menuButtonClick && !this.sidebarClick && (this.overlay || !this.isDesktop())) {
+        this.sidebarActive = false;
+      }
 
-        event.preventDefault();
+      this.topbarItemClick = false;
+      this.sidebarClick = false;
+      this.menuButtonClick = false;
+    });
+  }
+
+  onTabClick(event: Event, index: number) {
+    if (this.activeTabIndex === index) {
+      this.sidebarActive = !this.sidebarActive;
+    } else {
+      this.activeTabIndex = index;
+      this.sidebarActive = true;
+    }
+    if (this.activeTabIndex !== 1) {
+      this.sidebarActive = !this.sidebarActive;
+    }
+    if (index === 4) {
+      this.user.logout();
     }
 
-    onTopbarItemClick(event: Event, item) {
-        this.topbarItemClick = true;
+    event.preventDefault();
+  }
 
-        if(this.activeTopbarItem === item)
-            this.activeTopbarItem = null;
-        else
-            this.activeTopbarItem = item;
+  closeSidebar(event: Event) {
+    this.sidebarActive = false;
+    event.preventDefault();
+  }
 
-        event.preventDefault();
-    }
-    
-    onTopbarSearchItemClick(event: Event) {
-        this.topbarItemClick = true;
+  onSidebarClick(event: Event) {
+    this.sidebarClick = true;
+  }
 
-        event.preventDefault();
-    }
+  onTopbarMenuButtonClick(event: Event) {
+    this.topbarItemClick = true;
+    this.topbarMenuActive = !this.topbarMenuActive;
 
-    get overlay(): boolean {
-        return this.layoutMode === MenuOrientation.OVERLAY;
-    }
+    event.preventDefault();
+  }
 
-    changeToStaticMenu() {
-        this.layoutMode = MenuOrientation.STATIC;
-    }
+  onMenuButtonClick(event: Event, index: number) {
+    console.log(event, "event onMenuButtonClick");
 
-    changeToOverlayMenu() {
-        this.layoutMode = MenuOrientation.OVERLAY;
-    }
+    this.menuButtonClick = true;
+    this.rotateMenuButton = !this.rotateMenuButton;
+    this.topbarMenuActive = false;
+    this.sidebarActive = !this.sidebarActive;
 
-    isDesktop() {
-        return window.innerWidth > 1024;
-    }
-
-    ngOnDestroy() {
-        if(this.documentClickListener) {
-            this.documentClickListener();
-        }  
+    if (this.layoutMode === MenuOrientation.OVERLAY) {
+      this.overlayMenuActive = !this.overlayMenuActive;
+    } else {
+      if (this.isDesktop()) this.staticMenuDesktopInactive = !this.staticMenuDesktopInactive;
+      else this.staticMenuMobileActive = !this.staticMenuMobileActive;
     }
 
+    if (this.activeTabIndex < 0) {
+      this.activeTabIndex = 0;
+    }
+
+    event.preventDefault();
+  }
+
+  onTopbarItemClick(event: Event, item) {
+    this.topbarItemClick = true;
+
+    if (this.activeTopbarItem === item) this.activeTopbarItem = null;
+    else this.activeTopbarItem = item;
+
+    event.preventDefault();
+  }
+
+  onTopbarSearchItemClick(event: Event) {
+    this.topbarItemClick = true;
+
+    event.preventDefault();
+  }
+
+  get overlay(): boolean {
+    return this.layoutMode === MenuOrientation.OVERLAY;
+  }
+
+  changeToStaticMenu() {
+    this.layoutMode = MenuOrientation.STATIC;
+  }
+
+  changeToOverlayMenu() {
+    this.layoutMode = MenuOrientation.OVERLAY;
+  }
+
+  isDesktop() {
+    return window.innerWidth > 1024;
+  }
+
+  ngOnDestroy() {
+    if (this.documentClickListener) {
+      this.documentClickListener();
+    }
+  }
 }

@@ -1,21 +1,42 @@
 <div class="layout-sidebar" [ngStyle]="{'overflow':app.sidebarActive ? 'hidden' : 'visible'}" (click)="app.onSidebarClick($event)">
-    <div class="layout-tabmenu">
-        <ul class="layout-tabmenu-nav">
-            <li [ngClass]="{'active-item':app.activeTabIndex === 0}">
-                <a href="#" class="tabmenuitem-link" (click)="app.onTabClick($event, 0)"><i class="fa fa-folder-open"></i></a>
-                <div class="layout-tabmenu-tooltip">
-                    <div class="layout-tabmenu-tooltip-arrow"></div>
-                    <div class="layout-tabmenu-tooltip-text">Sections</div>
-                </div>
-            </li>
-            <li [ngClass]="{'active-item':app.activeTabIndex === 1}">
-                <a routerLink="/mail" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 1)"><i class="fa fa-envelope-o"></i></a>
-                <div class="layout-tabmenu-tooltip">
-                    <div class="layout-tabmenu-tooltip-arrow"></div>
-                    <div class="layout-tabmenu-tooltip-text">Mail Management</div>
-                </div>
-            </li>
-            <!--<li [ngClass]="{'active-item':app.activeTabIndex === 2}">
+  <div class="layout-tabmenu">
+    <ul class="layout-tabmenu-nav">
+      <li [ngClass]="{'active-item':app.activeTabIndex === 0}">
+        <a routerLink="/" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 0)"><i class="fa fa-home"></i></a>
+        <div class="layout-tabmenu-tooltip">
+          <div class="layout-tabmenu-tooltip-arrow"></div>
+          <div class="layout-tabmenu-tooltip-text">Dashboard</div>
+        </div>
+      </li>
+      <li [ngClass]="{'active-item':app.activeTabIndex === 1}">
+        <a href="#" class="tabmenuitem-link" (click)="app.onTabClick($event, 1)"><i class="fa fa-rss"></i></a>
+        <div class="layout-tabmenu-tooltip">
+          <div class="layout-tabmenu-tooltip-arrow"></div>
+          <div class="layout-tabmenu-tooltip-text">Feeds</div>
+        </div>
+      </li>
+      <li [ngClass]="{'active-item':app.activeTabIndex === 2}">
+        <a routerLink="/mail" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 2)"><i class="fa fa-envelope-o"></i></a>
+        <div class="layout-tabmenu-tooltip">
+          <div class="layout-tabmenu-tooltip-arrow"></div>
+          <div class="layout-tabmenu-tooltip-text">Mail Management</div>
+        </div>
+      </li>
+      <li [ngClass]="{'active-item':app.activeTabIndex === 3}">
+        <a routerLink="/sponsors" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 3)"><i class="fa fa-money"></i></a>
+        <div class="layout-tabmenu-tooltip">
+          <div class="layout-tabmenu-tooltip-arrow"></div>
+          <div class="layout-tabmenu-tooltip-text">Sponsors</div>
+        </div>
+      </li>
+      <li [ngClass]="{'active-item':app.activeTabIndex === 4}">
+        <a routerLink="#" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 4)"><i class="fa fa-sign-out"></i></a>
+        <div class="layout-tabmenu-tooltip">
+          <div class="layout-tabmenu-tooltip-arrow"></div>
+          <div class="layout-tabmenu-tooltip-text">Sign Out</div>
+        </div>
+      </li>
+      <!--<li [ngClass]="{'active-item':app.activeTabIndex === 2}">
                 <a href="#" class="ripplelink tabmenuitem-link" (click)="app.onTabClick($event, 2)"><i class="fa fa-calendar"></i></a>
                 <div class="layout-tabmenu-tooltip">
                     <div class="layout-tabmenu-tooltip-arrow"></div>
@@ -36,17 +57,17 @@
                     <div class="layout-tabmenu-tooltip-text">Updates</div>
                 </div>
             </li>-->
-        </ul>
-        <div class="layout-tabmenu-contents">
-            <div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 0}">
-                <div class="layout-submenu-title clearfix">
-                    <span>FEATURES</span>
-                </div>
-                <app-sidebarTabContent>
-                    <app-menu></app-menu>
-                </app-sidebarTabContent>
-            </div>
-            <!--<div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 1}">
+    </ul>
+    <div class="layout-tabmenu-contents">
+      <div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 1}">
+        <div class="layout-submenu-title clearfix">
+          <span>Feeds</span>
+        </div>
+        <app-sidebarTabContent>
+          <app-menu></app-menu>
+        </app-sidebarTabContent>
+      </div>
+      <!--<div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 1}">
                 <div class="layout-submenu-title clearfix">
                     <span>INBOX</span>
                 </div>
@@ -103,7 +124,7 @@
                     </div>
                 </app-sidebarTabContent>
             </div>-->
-            <div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 2}">
+      <!-- <div class="layout-tabmenu-content" [ngClass]="{'layout-tabmenu-content-active': app.activeTabIndex === 2}">
                 <div class="layout-submenu-title clearfix">
                     <span>CALENDAR</span>
                 </div>
@@ -238,7 +259,7 @@
                         <div class="progress-bar"><div class="progress-bar-indicator-4"></div></div>
                     </div>
                 </app-sidebarTabContent>
-            </div>
-        </div>
+            </div> -->
     </div>
+  </div>
 </div>

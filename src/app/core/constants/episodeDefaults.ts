@@ -16,65 +16,81 @@ export const EpisodeDefaults: any = {
     "itunes:keywords": { textContent: "" },
     "itunes:subtitle": { textContent: "" },
     "itunes:summary": { textContent: "" },
-    "itunes:explicit": { textContent: "no" }
+    "itunes:explicit": { textContent: "no" },
   },
   pulpmx: {
-    title: "Show #"
+    title: "Show #",
   },
   moto60: {
     title: "Show #",
     description:
-      "It's Matthes, you and this series' race discussion. Don't forget to call in. Remember to listen live Thursday's at 12pm PST!"
+      "It's Matthes, you and this series' race discussion. Don't forget to call in. Remember to listen live Thursday's at 11am PST!",
   },
   keefer: {
-    title: "Show #"
+    title: "Show #",
+  },
+  shiftinggears: {
+    title: "",
+  },
+  industryseating: {
+    title: "",
   },
   steveshow: {
     guest: {
-      title: "Guest: "
+      title: "Guest: ",
     },
     fantasy: {
-      title: `Moto Fantasy: Race ${raceType} ${year}`,
-      description: "Discussing the scoops that affect your Fantasy Moto picks before you make them."
+      title: `PulpMX Fantasy: Race ${raceType} ${year}`,
+      description:
+        "Discussing the scoops that affect your PulpMX Fantasy picks before you make them. Thanks to Pro Taper, Fly Racing and 100%.",
       // keywords: "fantasy"
     },
     review: {
       title: `Race ${raceType} ${year} Review`,
       description:
-        "Wrapping up action from the race weekend, covering all the scoops, with the normal cast of characters."
+        "Wrapping up action from the race weekend, covering all the scoops, with the normal cast of characters.",
     },
     postrace: {
       title: `Race ${year} ${raceType} Post-Race Interviews`,
-      description: "Post-race interviews brought to you by Pro Circuit."
+      description: "Post-race interviews brought to you by Pro Circuit.",
     },
     privateer: {
-      title: "Race Tech Suspension: Privateer Island Life Podcast #"
-      // keywords: "privateer"
-    }
+      title: "FXR Racing/Race Tech Privateer Island #",
+      description:
+        "Pulpmx30 code to save at FXR Racing.com and Pulp20 code at Race Tech to save.",
+    },
+    renthalreaction: {
+      title: "Renthal Reaction: ",
+      description: "",
+    },
   },
   hockey: {
-    title: "Show "
+    title: "Show ",
   },
   steveshowDefaults: [
     {
       value: "guest",
-      label: "Guest Pod"
+      label: "Guest Pod",
     },
     {
       value: "fantasy",
-      label: "Fantasy Pod"
+      label: "Fantasy Pod",
     },
     {
       value: "review",
-      label: "Race Review"
+      label: "Race Review",
     },
     {
       value: "postrace",
-      label: "Post-Race"
+      label: "Post-Race",
     },
     {
       value: "privateer",
-      label: "Privateer Pod"
-    }
-  ]
+      label: "Privateer Pod",
+    },
+    {
+      value: "renthalreaction",
+      label: "Renthal Reaction",
+    },
+  ],
 };

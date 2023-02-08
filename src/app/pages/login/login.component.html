@@ -1,0 +1,46 @@
+<div class="login-body">
+  <div class="login-panel ui-fluid">
+    <form [formGroup]="form" (ngSubmit)="submitLogin(form.value)">
+      <div class="ui-g login-container">
+        <div class="ui-g-12 logo-container">
+          <a class="morpheus-logo-link" href="dashboard.html">
+            <img
+              src="../../../assets/layout/images/logo.png"
+              class="morpheus-logo"
+            />
+          </a>
+        </div>
+        <div class="ui-g-12">
+          <input
+            formControlName="username"
+            type="text"
+            autocomplete="off"
+            class="ui-inputtext ui-corner-all ui-state-default ui-widget"
+            placeholder="Username"
+          />
+        </div>
+        <div class="ui-g-12">
+          <input
+            formControlName="password"
+            type="password"
+            autocomplete="off"
+            class="ui-inputtext ui-corner-all ui-state-default ui-widget"
+            placeholder="Password"
+          />
+        </div>
+        <div class="ui-g-12 button-container">
+          <button
+            type="submit"
+            class="ui-button raised-btn ui-widget ui-state-default ui-corner-all ui-button-text-icon-left"
+          >
+            <span class="ui-button-icon-left ui-c fa fa-fw fa-user"></span>
+            <span class="ui-button-text ui-c">Sign In</span>
+          </button>
+        </div>
+        <div class="ui-g-12" *ngIf="showError">
+          <h3 class="text-danger">Incorrect credentials</h3>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

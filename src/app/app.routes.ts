@@ -1,41 +1,33 @@
-import { Routes, RouterModule } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
-import { DashboardDemo } from './demo/view/dashboarddemo';
-import { Feeds } from './demo/view/feeds.component';
-import { Sponsors } from './demo/view/sponsors.component';
-import { Mail } from './demo/view/mail.component';
-// import { SampleDemo } from './demo/view/sampledemo';
-// import { FormsDemo } from './demo/view/formsdemo';
-// import { DataDemo } from './demo/view/datademo';
-// import { PanelsDemo } from './demo/view/panelsdemo';
-// import { OverlaysDemo } from './demo/view/overlaysdemo';
-// import { MenusDemo } from './demo/view/menusdemo';
-// import { MessagesDemo } from './demo/view/messagesdemo';
-// import { MiscDemo } from './demo/view/miscdemo';
-// import { EmptyDemo } from './demo/view/emptydemo';
-// import { ChartsDemo } from './demo/view/chartsdemo';
-// import { FileDemo } from './demo/view/filedemo';
-// import { UtilsDemo } from './demo/view/utilsdemo';
-// import { Documentation } from './demo/view/documentation';
+import { LoginComponent } from "./pages/login/login.component";
+import { AppComponent } from "./app.component";
+import { CanActivate, RouterModule, Routes } from "@angular/router";
+import { ModuleWithProviders } from "@angular/core";
+import { DashboardComponent } from "./pages/dashboard";
+import { FeedsComponent } from "./pages/feeds";
+import { SponsorsComponent } from "./pages/sponsors";
+import { MailComponent } from "./pages/mail";
+import { AuthGuard } from "./core/guards/authguard";
+import { HomeComponent } from "./home.component";
 
 export const routes: Routes = [
-    { path: '', component: DashboardDemo },
-    { path: 'feeds', component: Feeds },
-    { path: 'sponsors', component: Sponsors },
-    { path: 'mail', component: Mail },
-    // { path: 'sample', component: SampleDemo },
-    // { path: 'forms', component: FormsDemo },
-    // { path: 'data', component: DataDemo },
-    // { path: 'panels', component: PanelsDemo },
-    // { path: 'overlays', component: OverlaysDemo },
-    // { path: 'menus', component: MenusDemo },
-    // { path: 'messages', component: MessagesDemo },
-    // { path: 'misc', component: MiscDemo },
-    // { path: 'empty', component: EmptyDemo },
-    // { path: 'charts', component: ChartsDemo },
-    // { path: 'file', component: FileDemo },
-    // { path: 'utils', component: UtilsDemo },
-    // { path: 'documentation', component: Documentation }
+  {
+    path: "",
+    // component: HomeComponent,
+    children: [
+      { path: "login", component: LoginComponent },
+      {
+        path: "",
+        component: AppComponent,
+        canActivate: [AuthGuard],
+        children: [
+          { path: "", component: DashboardComponent},
+          { path: "feeds/:show", component: FeedsComponent },
+          { path: "sponsors", component: SponsorsComponent },
+          { path: "mail", component: MailComponent }
+        ]
+      }
+    ]
+  }
 ];
 
 export const AppRoutes: ModuleWithProviders = RouterModule.forRoot(routes);
